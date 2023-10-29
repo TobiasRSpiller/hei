@@ -8,6 +8,16 @@ body {
     transition: background-color 1s;
 }
 
+.content {
+    text-align: center;
+}
+
+.city-name {
+    font-size: 5em;
+    font-family: 'Helvetica', sans-serif; /* Using Helvetica font */
+    margin-bottom: 20px;
+}
+
 .time-display {
     font-size: 3em;
 }
