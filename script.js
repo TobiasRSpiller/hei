@@ -8,8 +8,14 @@ function mixColors(color1, color2, ratio) {
     const r = color1[0] + (color2[0] - color1[0]) * ratio;
     const g = color1[1] + (color2[1] - color1[1]) * ratio;
     const b = color1[2] + (color2[2] - color1[2]) * ratio;
-    return `rgb(${r}, ${g}, ${b})`;
+    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
 }
+
+// Updated color definitions
+const night = [0, 38, 77];
+const goldenHour = [255, 204, 0];
+const day = [173, 216, 230];
+
 
 function getMinutesFromTimeString(timeString) {
     const [hours, minutes] = timeString.split(":").map(Number);
@@ -92,14 +98,32 @@ function updateBackgroundColor(totalMinutes = null) {
 
     let bgColor, r, g, b;
 
-    if (totalMinutes <= sunriseTime) {
+    if (totalMinutes <= sunriseTime - 15) {
         bgColor = night;
-    } else if (totalMinutes > sunriseTime && totalMinutes < sunriseTime + 60) {
-        bgColor = goldenHour;
-    } else if (totalMinutes >= sunriseTime + 60 && totalMinutes <= sunsetTime - 60) {
+
+    } else if (totalMinutes > sunriseTime - 30 && totalMinutes < sunriseTime) {
+        // Calculate the gradient ratio for the transition from night to golden hour
+        const ratio = getGradientRatio(totalMinutes, sunriseTime - 30, sunriseTime);
+        bgColor = mixColors(night, goldenHour, ratio).match(/\d+/g).map(Number);
+
+    } else if (totalMinutes >= sunriseTime && totalMinutes < sunriseTime + 15) {
+        // Calculate the gradient ratio for the transition from golden hour to day
+        const ratio = getGradientRatio(totalMinutes, sunriseTime, sunriseTime + 15);
+        bgColor = mixColors(goldenHour, day, ratio).match(/\d+/g).map(Number);
+
+    } else if (totalMinutes >= sunriseTime + 15 && totalMinutes <= sunsetTime - 15) {
         bgColor = day;
-    } else if (totalMinutes > sunsetTime - 60 && totalMinutes < sunsetTime) {
-        bgColor = goldenHour;
+
+    } else if (totalMinutes > sunsetTime - 15 && totalMinutes < sunsetTime) {
+        // Similar gradient logic for sunset
+        const ratio = getGradientRatio(totalMinutes, sunsetTime - 15, sunsetTime);
+        bgColor = mixColors(day, goldenHour, ratio).match(/\d+/g).map(Number);
+
+    } else if (totalMinutes >= sunsetTime && totalMinutes < sunsetTime + 45) {
+        // Calculate the gradient ratio for the transition from night to golden hour
+        const ratio = getGradientRatio(totalMinutes, sunsetTime, sunsetTime + 45);
+        bgColor = mixColors(goldenHour, night, ratio).match(/\d+/g).map(Number);
+
     } else {
         bgColor = night;
     }
@@ -118,12 +142,6 @@ function updateBackgroundColor(totalMinutes = null) {
         document.querySelector('.city-name').style.color = 'black';
     }
 }
-
-
-
-
-
-
 
 
 
