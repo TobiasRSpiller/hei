@@ -41,7 +41,7 @@ function updateTime() {
     const sunriseColor = [255, 215, 0];
     const midday = [135, 206, 250];
     const sunsetColor = [255, 69, 0];
-    const dusk = [75, 0, 130];
+    const dusk = [76, 0, 130];
 
     let bgColor;
 
