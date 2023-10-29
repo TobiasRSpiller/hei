@@ -23,44 +23,111 @@ function fetchSunriseSunset() {
     .then(data => {
         sunriseTime = getMinutesFromTimeString(new Date(data.results.sunrise).toLocaleTimeString());
         sunsetTime = getMinutesFromTimeString(new Date(data.results.sunset).toLocaleTimeString());
-        updateTime();
+        
+        // Update time and background color after fetching the sunrise and sunset times
+        updateDisplayedTime();   // Immediate time update
+        updateBackgroundColor(); // Immediate background color update
     });
 }
 
-function updateTime() {
+function updateDisplayedTime() {
     let now = new Date();
     // Convert to Zurich time
     let zurichTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Zurich"}));
-    const hours = zurichTime.getHours();
-    const minutes = zurichTime.getMinutes();
-    const totalMinutes = hours * 60 + minutes;
-
-    // Colors for different times of the day
-    const night = [25, 25, 112];
-    const dawn = [138, 43, 226];
-    const sunriseColor = [255, 215, 0];
-    const midday = [135, 206, 250];
-    const sunsetColor = [255, 69, 0];
-    const dusk = [76, 0, 130];
-
-    let bgColor;
-
-    if (totalMinutes < sunriseTime) {
-        bgColor = mixColors(night, dawn, getGradientRatio(totalMinutes, 0, sunriseTime));
-    } else if (totalMinutes < sunriseTime + 60) {
-        bgColor = mixColors(dawn, sunriseColor, getGradientRatio(totalMinutes, sunriseTime, sunriseTime + 60));
-    } else if (totalMinutes < sunsetTime - 60) {
-        bgColor = mixColors(sunriseColor, midday, getGradientRatio(totalMinutes, sunriseTime + 60, sunsetTime - 60));
-    } else if (totalMinutes < sunsetTime) {
-        bgColor = mixColors(midday, sunsetColor, getGradientRatio(totalMinutes, sunsetTime - 60, sunsetTime));
-    } else {
-        bgColor = mixColors(sunsetColor, night, getGradientRatio(totalMinutes, sunsetTime, 1440));
-    }
-
-    document.body.style.backgroundColor = bgColor;
     document.getElementById('time').innerText = zurichTime.toLocaleTimeString();
 }
 
-// Fetch sunrise and sunset times and then update the background color
+document.addEventListener("DOMContentLoaded", function() {
+    const timeSlider = document.getElementById('timeSlider');
+    
+    // Get current Zurich time in minutes
+    const now = new Date();
+    const zurichTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Zurich"}));
+    const currentMinutes = zurichTime.getHours() * 60 + zurichTime.getMinutes();
+    
+    // Set the slider to the current time
+    timeSlider.value = currentMinutes;
+
+    // Update the label immediately
+    const hours = Math.floor(currentMinutes / 60);
+    const minutes = currentMinutes % 60;
+    document.getElementById('sliderLabel').innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+    // Add the input event listener
+    timeSlider.addEventListener('input', function(event) {
+        // Get the total minutes from the slider
+        const totalMinutes = parseInt(event.target.value);
+
+        // Convert minutes to HH:MM format and display it
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        document.getElementById('sliderLabel').innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+        updateBackgroundColor(totalMinutes);
+    });
+});
+
+
+function isColorDark(r, g, b) {
+    // Calculate luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance <= 0.5;
+}
+
+function updateBackgroundColor(totalMinutes = null) {
+    let now, zurichTime, hours, minutes;
+    
+    if (totalMinutes === null) {
+        now = new Date();
+        zurichTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Zurich"}));
+        hours = zurichTime.getHours();
+        minutes = zurichTime.getMinutes();
+        totalMinutes = hours * 60 + minutes;
+    }
+
+    // Define colors
+    const night = [0, 0, 0];
+    const goldenHour = [255, 165, 0];
+    const day = [173, 216, 230];
+
+    let bgColor, r, g, b;
+
+    if (totalMinutes <= sunriseTime) {
+        bgColor = night;
+    } else if (totalMinutes > sunriseTime && totalMinutes < sunriseTime + 60) {
+        bgColor = goldenHour;
+    } else if (totalMinutes >= sunriseTime + 60 && totalMinutes <= sunsetTime - 60) {
+        bgColor = day;
+    } else if (totalMinutes > sunsetTime - 60 && totalMinutes < sunsetTime) {
+        bgColor = goldenHour;
+    } else {
+        bgColor = night;
+    }
+
+    [r, g, b] = bgColor;
+
+    document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    document.getElementById('time').innerText = (hours ? hours.toString().padStart(2, '0') : '00') + ':' + (minutes ? minutes.toString().padStart(2, '0') : '00');
+
+    // Check if the color is dark and set the text color accordingly
+    if (isColorDark(r, g, b)) {
+        document.getElementById('time').style.color = 'white';
+        document.querySelector('.city-name').style.color = 'white';
+    } else {
+        document.getElementById('time').style.color = 'black';
+        document.querySelector('.city-name').style.color = 'black';
+    }
+}
+
+
+
+
+
+
+
+
+
+// Fetch sunrise and sunset times and then update the background color and time
 fetchSunriseSunset();
-setInterval(updateTime, 60000); // Update every 60 seconds
+setInterval(updateDisplayedTime, 1000);  // Update displayed time every second
+setInterval(updateBackgroundColor, 60000); // Update background color every minute after the first immediate update
