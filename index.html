@@ -8,15 +8,14 @@
 </head>
 <body>
     <div class="content">
-        <div class="city-name">ZURICH</div>
+        <div class="city-name">ZÜRICH</div>
         <div class="time-display">
             <span id="time">00:00:00</span>
-        </div>
-        <div class="slider-container">
-            <input id="timeSlider" type="range" min="0" max="1439" step="1">
-            <label for="timeSlider" id="sliderLabel">00:00</label>
-        </div>
     </div>
-    <script src="script.js"></script>
+    <canvas id="starsCanvas"></canvas>
+    <script src="api.js"></script> <!-- Fetch sunrise and sunset times -->
+    <script src="background.js"></script> <!-- Handle background color -->
+    <script src="script.js"></script> <!-- Coordinate the application -->
+    <script src="time.js"></script> <!-- Handle time-related functions -->
 </body>
 </html>

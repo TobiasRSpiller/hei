@@ -1,10 +1,15 @@
 body {
-    font-family: 'Helvetica', sans-serif; /* Using Helvetica font */
+    font-family: 'Monaco', sans-serif; /* Using Helvetica font */
     height: 100vh;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 1s linear; /* Smooth transition for background changes */
+    min-height: 100vh; /* Ensure full vertical height */
+     /* Initial background gradient - this will be overridden by JavaScript */
+    background: linear-gradient(to bottom, #ffffff 0%, #0000ff 100%);
+      
 }
 
 .content {
@@ -13,10 +18,26 @@ body {
 
 .city-name {
     font-size: 5em;
-    font-family: 'Helvetica', sans-serif; /* Using Helvetica font */
+    font-family: 'Monaco', sans-serif; /* Using Helvetica font */
     margin-bottom: 20px;
 }
 
 .time-display {
     font-size: 3em;
+}
+
+canvas#starsCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* So it doesn't interfere with other UI elements */
+    z-index: -1; /* Place it behind other content */
+    
+}
+
+#canvas {
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
 }
