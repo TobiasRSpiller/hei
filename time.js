@@ -2,8 +2,8 @@ function updateDisplayedTime() {
     let now = new Date();
     // Convert to Zurich time
     let zurichTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Zurich" }));
-    // Format the time to show only hours and minutes
-    let formattedTime = zurichTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    // Format the time to show only hours and minutes in 24-hour format
+    let formattedTime = zurichTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     document.getElementById('time').innerText = formattedTime;
 }
 
